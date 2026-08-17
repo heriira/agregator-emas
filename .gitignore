@@ -1,7 +1,14 @@
-node_modules/
+.*/ 
+
+# Windows WSL artifacts
+*:Zone.Identifier
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
 .env
 .env.local
-.next/
-dist/
-build/
+
 EOF
