@@ -1,0 +1,91 @@
+
+/** 
+ * learn more about it in the docs: https://pris.ly/d/prisma-schema
+ * Get a free hosted Postgres database in seconds: `npx create-db`
+ */
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Investor {
+  investor_id Int            @id @default(autoincrement())
+  name        String
+  email       String         @unique
+  password    String
+  created_at  DateTime       @default(now())
+  alerts      PriceAlert[]
+  notifs      Notification[]
+}
+
+model Admin {
+  admin_id   Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String
+  created_at DateTime @default(now())
+}
+
+model GoldProvider {
+  provider_id  Int          @id @default(autoincrement())
+  source       String       @unique
+  display_name String
+  type         String
+  status       String       @default("visible")
+  logo         String?
+  url_homepage String?
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+  updated_by   Int?
+  last_checked_at DateTime?
+  prices       GoldPrice[]
+  alerts       PriceAlert[]
+}
+
+model GoldPrice {
+  price_id      Int          @id @default(autoincrement())
+  provider_id   Int
+  sell_price    Decimal
+  buyback_price Decimal?
+  recorded_date DateTime
+  fetched_at    DateTime     @default(now())
+  provider      GoldProvider @relation(fields: [provider_id], references: [provider_id])
+}
+
+model PriceAlert {
+  alert_id     Int           @id @default(autoincrement())
+  investor_id  Int
+  provider_id  Int
+  target_price Decimal
+  price_type   String
+  /** 
+   * "gte" = menunggu harga NAIK menyentuh target, 
+   * "lte" = menunggu harga TURUN menyentuh target.
+   */
+  condition    String        @default("gte")
+  status       String        @default("aktif")
+  created_at   DateTime      @default(now())
+  investor     Investor      @relation(fields: [investor_id], references: [investor_id])
+  provider     GoldProvider  @relation(fields: [provider_id], references: [provider_id])
+  notification Notification?
+}
+
+model WorldGoldPrice {
+  id            Int      @id @default(autoincrement())
+  price_usd_oz  Decimal
+  recorded_at   DateTime @default(now())
+}
+
+model Notification {
+  notification_id Int        @id @default(autoincrement())
+  investor_id     Int
+  alert_id        Int        @unique
+  sent_at         DateTime   @default(now())
+  status          String
+  investor        Investor   @relation(fields: [investor_id], references: [investor_id])
+  alert           PriceAlert @relation(fields: [alert_id], references: [alert_id])
+}
