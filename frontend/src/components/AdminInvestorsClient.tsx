@@ -51,9 +51,6 @@ export function AdminInvestorsClient() {
   return (
     <div>
       <div className="mb-6">
-        <p className="mb-1.5 text-[11px] font-semibold tracking-wide text-amber-700 uppercase">
-          Manajemen Sistem
-        </p>
         <h1 className="mb-1 text-[22px] font-bold tracking-tight text-foreground">
           Pengguna Terdaftar
         </h1>

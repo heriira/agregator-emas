@@ -35,9 +35,6 @@ export function AdminSidebar() {
       </div>
 
       <div className="flex flex-1 flex-col gap-0.5">
-        <p className="mb-1 px-3 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
-          Utama
-        </p>
         {ADMIN_NAV.map((item) => {
           const isActive = pathname === item.href;
           return (

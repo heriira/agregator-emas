@@ -46,9 +46,6 @@ export default async function HomePage() {
         >
           {/* BAGIAN KIRI: TEKS */}
           <div>
-            <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1">
-              <span className="size-1.5 rounded-full bg-gold" />
-            </div>
 
             <h1 className="mb-3 max-w-xl text-3xl leading-[1.25] font-bold tracking-tight text-foreground">
               Bandingkan Harga Emas
