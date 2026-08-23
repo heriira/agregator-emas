@@ -54,7 +54,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="mb-5 max-w-[460px] text-sm leading-relaxed text-muted-foreground">
-              Temukan harga terbaik dari berbagai penyedia emas terpercaya dalam satu halaman. Hemat waktu, dan ambil keputusan lebih sesuai.
+              Temukan harga terbaik dari berbagai penyedia emas terpercaya dalam satu halaman. Hemat waktu, dan ambil keputusan lebih tepat.
             </p>
 
             <div className="mb-5 flex flex-wrap gap-2.5">

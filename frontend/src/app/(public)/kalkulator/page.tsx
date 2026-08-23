@@ -27,13 +27,12 @@
               Kalkulator Investasi Emas
             </h1>
             <p className="mb-3.5 text-[13px] leading-relaxed text-muted-foreground">
-              Masukkan jumlah gram atau nominal rupiah untuk melihat perbandingan
-              dari semua penyedia sekaligus.
+              Masukkan jumlah gram atau nominal rupiah untuk melihat perbandingan dari semua penyedia.
             </p>
             <div className="flex items-start gap-2.5 rounded-[10px] border border-amber-200 bg-amber-50 px-4 py-2.5">
               <WarningCircle width={24} height={24} className="mt-px shrink-0 text-amber-800" />
               <p className="text-[11px] leading-relaxed text-amber-800">
-                <strong>Disclaimer:</strong> Hasil kalkulator ini hanya estimasi. Harga aktual dapat berbeda karena tidak mencakup biaya layanan, pajak, biaya pengiriman, 
+                <strong>Disclaimer:</strong> Hasil kalkulator ini hanya estimasi. Harga sebenarnya dapat berbeda karena tidak mencakup biaya layanan, pajak, biaya pengiriman, 
                 atau ketentuan lain dari masing-masing penyedia. Selalu verifikasi harga final langsung di platform resmi penyedia sebelum bertransaksi.
               </p>
             </div>

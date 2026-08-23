@@ -347,7 +347,7 @@ export function KalkulatorForm({ items }: KalkulatorFormProps) {
                 <div className="text-left">
                   <p className="mb-0.5 text-[10px] text-muted-foreground">
                     {mode === "beli"
-                      ? "Potensi penghematan (termurah vs termahal)"
+                      ? "Berpotensi menghemat (termurah vs termahal)"
                       : "Selisih hasil terbaik vs terburuk"}
                   </p>
                   <p className="text-base font-bold text-green-700">

@@ -148,7 +148,7 @@ export function PriceExplorer({ items }: PriceExplorerProps) {
 
       <div className="mb-4 flex flex-col gap-1 md:flex-row md:items-center md:gap-2.5">
         <span className="text-[12px] font-medium text-muted-foreground">
-          {itemsForTab.length} penyedia ditampilkan
+          {itemsForTab.length} penyedia tersedia
         </span>
         {lastUpdated && (
           <>

@@ -25,10 +25,10 @@ export function EducationSection() {
   return (
     <div className="mt-11 border-t border-border pt-7">
       <h2 className="mb-1 text-[15px] font-bold text-foreground">
-        Pahami Investasi Emas
+        Memahami Investasi Emas
       </h2>
       <p className="mb-4 text-xs text-muted-foreground">
-        Sebelum berinvestasi, kenali perbedaan antara emas fisik dan emas digital.
+        Pelajari istilah dan konsep penting seputar emas sebelum memulai investasi.
       </p>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">

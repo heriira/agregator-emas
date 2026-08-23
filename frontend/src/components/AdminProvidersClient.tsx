@@ -150,7 +150,7 @@ export function AdminProvidersClient() {
           Penyedia Layanan Emas
         </h1>
         <p className="text-[13px] text-muted-foreground">
-          Kelola visibilitas penyedia layanan emas yang ditampilkan kepada pengguna.
+          Kelola visibilitas penyedia layanan emas yang ditampilkan.
         </p>
       </div>
 
@@ -338,8 +338,8 @@ export function AdminProvidersClient() {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {pending?.nextStatus === "hidden"
-                ? `Penyedia ${pending?.provider.displayName} tidak akan ditampilkan kepada pengguna di halaman publik.`
-                : `Penyedia ${pending?.provider.displayName} akan kembali ditampilkan kepada pengguna di halaman publik.`}
+                ? `Penyedia ${pending?.provider.displayName} tidak akan ditampilkan di halaman publik.`
+                : `Penyedia ${pending?.provider.displayName} akan kembali ditampilkan di halaman publik.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
 

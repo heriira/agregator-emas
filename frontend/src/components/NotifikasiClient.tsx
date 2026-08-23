@@ -332,8 +332,8 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
           </div>
           <p className="mt-1.5 text-[10px] text-muted-foreground">
             {jenis === "beli"
-              ? "Notifikasi dikirim saat harga beli menyentuh target — arah (naik/turun) otomatis mengikuti posisi target terhadap harga saat ini."
-              : "Notifikasi dikirim saat harga jual menyentuh target — arah (naik/turun) otomatis mengikuti posisi target terhadap harga saat ini."}
+              ? "Notifikasi dikirim saat harga beli menyentuh target, arah (naik/turun) otomatis mengikuti posisi target terhadap harga saat ini."
+              : "Notifikasi dikirim saat harga jual menyentuh target, arah (naik/turun) otomatis mengikuti posisi target terhadap harga saat ini."}
           </p>
           {buybackUnavailable && (
             <p className="mt-1.5 rounded-[8px] bg-muted px-2.5 py-1.5 text-[11px] text-muted-foreground">
