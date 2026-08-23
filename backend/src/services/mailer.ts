@@ -11,10 +11,13 @@ if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
 }
 
 const transporter = nodemailer.createTransport({
-  host: SMTP_HOST,
-  port: Number(SMTP_PORT),
-  secure: Number(SMTP_PORT) === 465,
-  auth: { user: SMTP_USER, pass: SMTP_PASS },
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: process.env.SMTP_SECURE === 'true', // true untuk port 465
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
 });
 
 interface SendMailInput {
