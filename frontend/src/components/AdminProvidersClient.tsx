@@ -241,7 +241,7 @@ export function AdminProvidersClient() {
                 <TableHead>Penyedia</TableHead>
                 <TableHead>Kategori</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Data Harga</TableHead>
+                {/* <TableHead>Data Harga</TableHead> */}
                 <TableHead>Diperbarui</TableHead>
                 <TableHead className="text-center">Aksi</TableHead>
               </TableRow>
@@ -288,7 +288,7 @@ export function AdminProvidersClient() {
                         {isVisible ? "Ditampilkan" : "Disembunyikan"}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <span
                         className={
                           "flex items-center gap-1 text-[12px] font-semibold " +
@@ -301,7 +301,7 @@ export function AdminProvidersClient() {
                         }
                         {provider.lastFetchedAt ? "Tersimpan" : "Belum ada"}
                     </span>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className="text-muted-foreground">
                           <span className="flex items-center gap-1 text-[13px] font-regular " >
                             {provider.lastFetchedAt ? formatDateTime(provider.lastFetchedAt) : "Belum ada data"}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -76,6 +76,8 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
   const [alertsError, setAlertsError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabStatus>("aktif");
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [formOpen, setFormOpen] = useState(true);
+  const listRef = useRef<HTMLDivElement>(null);
 
   async function refreshAlerts() {
     try {
@@ -185,6 +187,16 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
        * Pesan berhasil hanya ditampilkan sebentar agar tidak memenuhi tampilan.
        */
       setTimeout(() => setSuccessMessage(null), 3000);
+
+      /**
+       * Di tablet & mobile, panel form otomatis ditutup lalu scroll ke daftar target, sedangkan di desktop panel tetap terbuka sehingga langkah ini dilewati.
+       */
+      if (typeof window !== "undefined" && window.innerWidth < 1024) {
+        setFormOpen(false);
+        requestAnimationFrame(() => {
+          listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
     } catch (error) {
       setFormError(extractErrorMessage(error, "Gagal membuat target notifikasi."));
     } finally {
@@ -212,10 +224,21 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr] lg:items-start">
       {/* PANEL KIRI */}
       <div className="rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-[76px]">
-        <h2 className="mb-4 text-sm font-semibold text-foreground">
-          Tambah Target Notifikasi
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-foreground">
+            Tambah Target Notifikasi
+          </h2>
+          {/* Toggle collapse/expand hanya tampil di tablet & mobile, di desktop panel selalu terbuka. */}
+          <button
+            type="button"
+            onClick={() => setFormOpen((value) => !value)}
+            className="text-xs font-medium text-muted-foreground hover:text-foreground lg:hidden"
+          >
+            Tambah Target {formOpen ? "▲" : "▼"}
+          </button>
+        </div>
 
+        <div className={formOpen ? "block" : "hidden lg:block"}>
         <div className="mb-3.5">
           <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">
             Kategori Emas
@@ -389,10 +412,11 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
             {successMessage}
           </p>
         )}
+        </div>
       </div>
 
       {/* PANEL KANAN: daftar target */}
-      <div>
+      <div ref={listRef}>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex gap-1.5">
             <Button

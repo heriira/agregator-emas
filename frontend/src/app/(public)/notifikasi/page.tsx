@@ -17,13 +17,12 @@ export default async function NotifikasiPage() {
   return (
     <main className="flex-1">
       <div className="border-b border-border bg-card">
-        <div className="mx-auto max-w-[1100px] px-6 py-7">
+        <div className="mx-auto max-w-[1100px] px-6 py-12">
           <h1 className="mb-1.5 text-2xl font-bold tracking-tight text-foreground">
             Notifikasi Harga Emas
           </h1>
           <p className="text-[13px] leading-relaxed text-muted-foreground">
-            Atur target harga dan kami akan mengirimkan notifikasi melalui surel
-            saat harga mencapai target yang kamu tentukan.
+            Atur target harga dan dapatkan notifikasi melalui email saat harga mencapai target yang kamu tentukan.
           </p>
         </div>
       </div>

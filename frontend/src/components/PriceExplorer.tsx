@@ -112,9 +112,9 @@ export function PriceExplorer({ items }: PriceExplorerProps) {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
+      <div className="mt-3 mb-5 flex flex-col gap-5 md:mt-0 md:mb-4 md:flex-row md:flex-wrap md:items-center md:justify-between">
         <Tabs value={tab} onValueChange={(value) => setTab(value as GoldType)}>
-          <TabsList className="border border-border bg-white">
+          <TabsList className="w-full border border-border bg-white md:w-fit">
             <TabsTrigger
               value="fisik"
               className="data-active:!bg-foreground data-active:!text-primary-foreground"
@@ -130,13 +130,14 @@ export function PriceExplorer({ items }: PriceExplorerProps) {
           </TabsList>
         </Tabs>
 
-        <div className="flex items-center gap-1.5">
-          <span className="text-[11px] text-muted-foreground">Urutkan:</span>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:overflow-visible md:pb-0">
+          <span className="hidden sm:inline shrink-0 text-[11px] text-muted-foreground">Urutkan:</span>
           {SORT_OPTIONS.map((option) => (
             <Button
               key={option.value}
               size="sm"
               variant={sortMode === option.value ? "default" : "outline"}
+              className="shrink-0"
               onClick={() => setSortMode(option.value)}
             >
               {option.label}
@@ -145,13 +146,13 @@ export function PriceExplorer({ items }: PriceExplorerProps) {
         </div>
       </div>
 
-      <div className="mb-4 flex items-center gap-2.5">
+      <div className="mb-4 flex flex-col gap-1 md:flex-row md:items-center md:gap-2.5">
         <span className="text-[12px] font-medium text-muted-foreground">
           {itemsForTab.length} penyedia ditampilkan
         </span>
         {lastUpdated && (
           <>
-            <span className="size-[3px] rounded-full bg-gray-300" />
+            <span className="hidden size-[3px] rounded-full bg-gray-300 md:block" />
             <span className="text-[12px] text-muted-foreground">
               Terakhir diperbarui:{" "}
               <strong className="font-semibold text-gray-700">
@@ -176,7 +177,7 @@ export function PriceExplorer({ items }: PriceExplorerProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-3">
           {sortedItems.map((item) => (
             <GoldCard
               key={item.source}

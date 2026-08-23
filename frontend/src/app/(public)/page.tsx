@@ -40,14 +40,14 @@ export default async function HomePage() {
       <div className="border-b border-border bg-card">
         <div
           className={
-            "mx-auto grid max-w-[1100px] items-center gap-10 px-6 py-12 " +
+            "mx-auto grid max-w-[1100px] items-center gap-6 px-4 py-8 md:gap-10 md:px-6 md:py-12 " +
             (worldPrice ? "lg:grid-cols-[1fr_380px]" : "")
           }
         >
           {/* BAGIAN KIRI: TEKS */}
           <div>
 
-            <h1 className="mb-3 max-w-xl text-3xl leading-[1.25] font-bold tracking-tight text-foreground">
+            <h1 className="mb-3 max-w-xl text-2xl leading-[1.25] font-bold tracking-tight text-foreground md:text-3xl">
               Bandingkan Harga Emas
               <br />
               <span className="text-gold">Fisik &amp; Digital</span> di Indonesia
@@ -93,7 +93,7 @@ export default async function HomePage() {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="mx-auto max-w-[1100px] px-6 py-7">
+      <div className="mx-auto max-w-[1100px] px-4 py-7 md:px-6">
         {fetchError ? (
           <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-8 text-center">
             <p className="text-sm font-medium text-red-800">{fetchError}</p>

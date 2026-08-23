@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { KalkulatorResultCard } from "@/components/KalkulatorResultCard";
@@ -36,6 +36,8 @@ export function KalkulatorForm({ items }: KalkulatorFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<CalculatedResult[] | null>(null);
   const [excludedFromResults, setExcludedFromResults] = useState(0);
+  const [paramsOpen, setParamsOpen] = useState(true);
+  const resultRef = useRef<HTMLDivElement>(null);
   const isGramInput = kategori === "fisik" ? true : inputType === "gram";
 
   function setKategori(value: Kategori) {
@@ -112,6 +114,16 @@ export function KalkulatorForm({ items }: KalkulatorFormProps) {
 
     setResults(sorted);
     setExcludedFromResults(excludedCount);
+
+    /**
+     * Di tablet & mobile, panel form otomatis ditutup lalu scroll ke daftar target, sedangkan di desktop panel tetap terbuka sehingga langkah ini dilewati.
+     */
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      setParamsOpen(false);
+      requestAnimationFrame(() => {
+        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }
 
   function handleReset() {
@@ -129,10 +141,21 @@ export function KalkulatorForm({ items }: KalkulatorFormProps) {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr] lg:items-start">
       {/* PANEL KIRI */}
       <div className="rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-[76px]">
-        <h2 className="mb-4 text-sm font-semibold text-foreground">
-          Parameter Perhitungan
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-foreground">
+            Parameter Perhitungan
+          </h2>
+          {/* Toggle collapse/expand hanya tampil di tablet & mobile, di desktop panel selalu terbuka. */}
+          <button
+            type="button"
+            onClick={() => setParamsOpen((value) => !value)}
+            className="text-xs font-medium text-muted-foreground hover:text-foreground lg:hidden"
+          >
+            Parameter {paramsOpen ? "▲" : "▼"}
+          </button>
+        </div>
 
+        <div className={paramsOpen ? "block" : "hidden lg:block"}>
         <div className="mb-4">
           <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">
             Kategori Emas
@@ -280,10 +303,11 @@ export function KalkulatorForm({ items }: KalkulatorFormProps) {
         <Button variant="ghost" className="mt-1.5 w-full text-muted-foreground" onClick={handleReset}>
           Reset
         </Button>
+        </div>
       </div>
 
       {/* PANEL KANAN: hasil */}
-      <div>
+      <div ref={resultRef}>
         {!results && (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card px-6 py-16 text-center">
             <Calculator width={32} height={32} className="mb-3 text-foreground" />
@@ -308,10 +332,10 @@ export function KalkulatorForm({ items }: KalkulatorFormProps) {
 
         {results && best && worst && (
           <>
-            <div className="mb-3.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+            <div className="mb-3.5 rounded-xl border border-gray-200 bg-white px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="mb-0.5 text-[11px] text-amber-800">
+                  <p className="mb-0.5 text-[11px] text-gray-800">
                     Estimasi {mode === "beli" ? "pembelian" : "penjualan kembali"}{" "}
                     {kategori === "fisik" ? "emas fisik" : "emas digital"}
                   </p>
@@ -320,13 +344,13 @@ export function KalkulatorForm({ items }: KalkulatorFormProps) {
                     {results.length} penyedia dibandingkan
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-left">
                   <p className="mb-0.5 text-[10px] text-muted-foreground">
                     {mode === "beli"
                       ? "Potensi penghematan (termurah vs termahal)"
                       : "Selisih hasil terbaik vs terburuk"}
                   </p>
-                  <p className="text-base font-bold text-gold">
+                  <p className="text-base font-bold text-green-700">
                     {isGramInput
                       ? formatRupiah(Math.abs(best.rupiah - worst.rupiah))
                       : formatGram(Math.abs(best.gram - worst.gram))}

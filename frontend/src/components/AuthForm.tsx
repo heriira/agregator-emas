@@ -138,7 +138,7 @@ export function AuthForm({ initialTab, redirectTo }: AuthFormProps) {
   }
 
   return (
-    <div className="w-full max-w-[420px] rounded-[20px] border border-border bg-card p-8 shadow-sm">
+    <div className="w-full max-w-[420px] rounded-[20px] border border-border bg-card p-6 shadow-sm sm:p-8">
       <div className="mb-6 flex items-center gap-2">
         <div className="flex size-9 items-center justify-center rounded-[10px] bg-primary">
           <span className="text-sm font-bold text-gold">AE</span>

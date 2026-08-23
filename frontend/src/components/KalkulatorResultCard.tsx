@@ -86,14 +86,14 @@ export function KalkulatorResultCard({
         <div
           className={
             "shrink-0 rounded-[10px] border px-3 py-2 text-right " +
-            (rank === "best" ? "border-amber-300 bg-amber-50" : "border-amber-200 bg-amber-50/60")
+            (rank === "best" ? "border-green-300 bg-green-50" : "border-gray-200 bg-gray-50")
           }
         >
-          <p className="mb-0.5 text-[10px] whitespace-nowrap text-amber-800">{estimasiLabel}</p>
+          <p className="mb-0.5 text-[10px] whitespace-nowrap text-gray-800">{estimasiLabel}</p>
           <p
             className={
               "text-[15px] font-bold whitespace-nowrap " +
-              (rank === "best" ? "text-amber-700" : "text-gray-700")
+              (rank === "best" ? "text-green-700" : "text-gray-700")
             }
           >
             {estimasiValue}
@@ -101,7 +101,7 @@ export function KalkulatorResultCard({
         </div>
       </div>
 
-      <div className="my-3 grid grid-cols-3 gap-2">
+      <div className="my-3 grid grid-cols-2 gap-2 md:grid-cols-3">
         <div className="rounded-[10px] bg-muted p-2.5">
           <p className="mb-1 text-[10px] text-muted-foreground">Harga Beli/gram</p>
           <p className="text-[13px] font-semibold text-gray-700">
@@ -114,12 +114,12 @@ export function KalkulatorResultCard({
             {item.buybackPrice !== null ? formatRupiah(item.buybackPrice) : "Tidak tersedia"}
           </p>
         </div>
-        <div className="rounded-[10px] bg-muted p-2.5">
+        <div className="col-span-2 rounded-[10px] bg-muted p-2.5 md:col-span-1">
           <p className="mb-1 text-[10px] text-muted-foreground">Selisih beli-jual</p>
           {spread !== null && spreadPercent !== null ? (
             <>
-              <p className="text-[13px] font-semibold text-gray-700">{formatRupiah(spread)}</p>
-              <p className="mt-0.5 text-[10px] text-muted-foreground">
+              <p className="inline text-[13px] font-semibold text-gray-700">{formatRupiah(spread)}</p>
+              <p className="inline ml-2 mt-0.5 text-[10px] text-muted-foreground">
                 ({spreadPercent.toFixed(2)}%)
               </p>
             </>

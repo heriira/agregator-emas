@@ -34,7 +34,8 @@ export function Navbar() {
             Agregator Emas
           </span>
         </Link>
-        <div className="flex h-full items-stretch gap-1">
+        {/* Menu navigasi disembunyikan di mobile (< 768px) dipindah ke BottomNav. */}
+        <div className="hidden h-full items-stretch gap-1 md:flex">
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href;
             return (
