@@ -59,6 +59,18 @@ export function useAuthToken(): string | null {
   return useSyncExternalStore(subscribeToken, getStoredToken, getServerTokenSnapshot);
 }
 
+function noopSubscribe() {
+  return () => {};
+}
+
+export function useAuthReady(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false
+  );
+}
+
 /**
  * Helper sesi login investor di sisi client (localStorage).
  */

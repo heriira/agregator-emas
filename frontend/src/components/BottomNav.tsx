@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Commodity, Calculator, Bell } from "iconoir-react";
+import { useAuthToken } from "@/lib/auth";
+import { Commodity, Calculator, Bell, User } from "iconoir-react";
 
 const BOTTOM_NAV_ITEMS = [
   { href: "/", label: "Harga Emas", icon: Commodity },
@@ -13,11 +14,20 @@ const BOTTOM_NAV_ITEMS = [
 ];
 
 /**
+ * Item "Profil" hanya ditambahkan kalau investor sedang login di layar
+ * sempit (< 640px), greeting "Halo, {nama}" di Navbar ikut tersembunyi
+ * sehingga bottom navbar menjadi satu-satunya akses ke halaman profil.
+ */
+const PROFILE_NAV_ITEM = { href: "/profil", label: "Profil", icon: User };
+
+/**
  * Bottom navbar mobile disembunyikan saat scroll ke bawah dan ditampilkan saat scroll ke atas atau ketika pengguna berhenti scrolling selama 300ms.
  */
 export function BottomNav() {
   const pathname = usePathname();
+  const token = useAuthToken();
   const [visible, setVisible] = useState(true);
+  const items = token ? [...BOTTOM_NAV_ITEMS, PROFILE_NAV_ITEM] : BOTTOM_NAV_ITEMS;
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -47,7 +57,7 @@ export function BottomNav() {
         visible ? "translate-y-0" : "translate-y-full"
       )}
     >
-      {BOTTOM_NAV_ITEMS.map((item) => {
+      {items.map((item) => {
         const isActive = pathname === item.href;
         return (
           <Link

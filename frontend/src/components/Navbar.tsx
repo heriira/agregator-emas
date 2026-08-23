@@ -61,9 +61,12 @@ export function Navbar() {
         <div className="ml-auto flex items-center gap-2">
           {investor ? (
             <>
-              <span className="hidden text-[13px] text-muted-foreground sm:inline">
+              <Link
+                href="/profil"
+                className="hidden text-[13px] text-muted-foreground hover:text-foreground sm:inline"
+              >
                 Halo, <strong className="font-semibold text-foreground">{investor.name}</strong>
-              </span>
+              </Link>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 Keluar
               </Button>

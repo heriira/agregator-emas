@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -12,8 +13,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/format";
-import { getAdminNotifications } from "@/lib/api";
+import { getAdminNotifications, exportAdminNotifications } from "@/lib/api";
 import type { AdminNotificationItem } from "@/lib/api";
+import { Download } from "iconoir-react";
 
 function extractErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error) && typeof error.response?.data?.message === "string") {
@@ -38,6 +40,7 @@ function formatDateTime(iso: string) {
 export function AdminNotificationsClient() {
   const [notifications, setNotifications] = useState<AdminNotificationItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -54,15 +57,33 @@ export function AdminNotificationsClient() {
     };
   }, []);
 
+  async function handleExport() {
+    setError(null);
+    setIsExporting(true);
+    try {
+      await exportAdminNotifications();
+    } catch (err) {
+      setError(extractErrorMessage(err, "Gagal mengekspor log notifikasi."));
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="mb-1 text-[22px] font-bold tracking-tight text-foreground">
-          Log Notifikasi
-        </h1>
-        <p className="text-[13px] text-muted-foreground">
-          Riwayat seluruh email notifikasi target harga yang pernah dicoba dikirim sistem.
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="mb-1 text-[22px] font-bold tracking-tight text-foreground">
+            Log Notifikasi
+          </h1>
+          <p className="text-[13px] text-muted-foreground">
+            Riwayat seluruh email notifikasi target harga yang pernah dicoba dikirim sistem.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting}>
+          <Download width={16} height={16} />
+          {isExporting ? "Mengekspor..." : "Export Excel"}
+        </Button>
       </div>
 
       {error && (

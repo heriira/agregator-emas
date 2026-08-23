@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -201,7 +202,12 @@ export function AuthForm({ initialTab, redirectTo }: AuthFormProps) {
           </div>
 
           <div className="mb-5">
-            <label className="mb-1.5 block text-xs font-medium text-gray-700">Kata Sandi</label>
+            <div className="mb-1.5 flex items-center justify-between">
+              <label className="block text-xs font-medium text-gray-700">Kata Sandi</label>
+              <Link href="/lupa-password" className="text-xs font-medium text-gold hover:underline">
+                Lupa kata sandi?
+              </Link>
+            </div>
             <Input
               type="password"
               placeholder="Masukkan kata sandi"

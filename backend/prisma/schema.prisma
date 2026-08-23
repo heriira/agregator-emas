@@ -13,13 +13,25 @@ datasource db {
 }
 
 model Investor {
-  investor_id Int            @id @default(autoincrement())
+  investor_id Int                   @id @default(autoincrement())
   name        String
-  email       String         @unique
+  email       String                @unique
   password    String
-  created_at  DateTime       @default(now())
+  status      String                @default("aktif")
+  created_at  DateTime              @default(now())
   alerts      PriceAlert[]
   notifs      Notification[]
+  resetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id          Int      @id @default(autoincrement())
+  investor_id Int
+  token       String   @unique
+  expires_at  DateTime
+  used        Boolean  @default(false)
+  created_at  DateTime @default(now())
+  investor    Investor @relation(fields: [investor_id], references: [investor_id])
 }
 
 model Admin {

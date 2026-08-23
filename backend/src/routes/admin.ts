@@ -1,10 +1,69 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import * as XLSX from "xlsx";
 import { prisma } from "../lib/prisma";
 import { requireAdminAuth } from "../middleware/auth";
 
 const router = Router();
+
+/**
+ * Format tanggal untuk nama file export, mis. "2026-08-23" (zona waktu WIB).
+ */
+function formatTanggalFile(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+function formatTanggalWIB(date: Date): string {
+  return (
+    new Intl.DateTimeFormat("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "Asia/Jakarta",
+    }).format(date)
+  );
+}
+
+function formatWaktuWIB(date: Date): string {
+  return (
+    new Intl.DateTimeFormat("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Asia/Jakarta",
+    }).format(date) + " WIB"
+  );
+}
+
+/**
+ * Menyusun satu file Excel dari data tabular lalu mengirimkannya sebagai response download.
+ */
+function sendExcelFile(
+  res: import("express").Response,
+  filename: string,
+  sheetName: string,
+  rows: Record<string, string | number>[]
+) {
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.send(buffer);
+}
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -163,6 +222,7 @@ router.get("/investors", async (_req, res) => {
         investor_id: true,
         name: true,
         email: true,
+        status: true,
         created_at: true,
       },
     });
@@ -171,6 +231,91 @@ router.get("/investors", async (_req, res) => {
   } catch (error) {
     console.error("Gagal mengambil daftar investor:", error);
     res.status(500).json({ success: false, message: "Gagal mengambil daftar investor" });
+  }
+});
+
+/**
+ * GET /admin/investors/export
+ * Mengunduh seluruh data investor dalam bentuk file Excel (.xlsx).
+ */
+router.get("/investors/export", async (_req, res) => {
+  try {
+    const investors = await prisma.investor.findMany({
+      orderBy: { created_at: "desc" },
+      select: {
+        investor_id: true,
+        name: true,
+        email: true,
+        status: true,
+        created_at: true,
+      },
+    });
+
+    const rows = investors.map((investor, index) => ({
+      No: index + 1,
+      Nama: investor.name,
+      Email: investor.email,
+      Status: investor.status === "aktif" ? "Aktif" : "Nonaktif",
+      "Tanggal Daftar": formatTanggalWIB(investor.created_at),
+    }));
+
+    sendExcelFile(
+      res,
+      `daftar-investor-${formatTanggalFile(new Date())}.xlsx`,
+      "Investor",
+      rows
+    );
+  } catch (error) {
+    console.error("Gagal mengekspor data investor:", error);
+    res.status(500).json({ success: false, message: "Gagal mengekspor data investor" });
+  }
+});
+
+/**
+ * PATCH /admin/investors/:id/status
+ * Mengaktifkan atau menonaktifkan akun investor. Investor berstatus "nonaktif" ditolak saat login (lihat routes/auth.ts).
+ * Body: { status: "aktif" | "nonaktif" }
+ */
+router.patch("/investors/:id/status", async (req, res) => {
+  const investorId = Number(req.params.id);
+  const { status } = req.body;
+
+  if (Number.isNaN(investorId)) {
+    return res.status(400).json({ success: false, message: "ID investor tidak valid" });
+  }
+
+  if (status !== "aktif" && status !== "nonaktif") {
+    return res.status(400).json({
+      success: false,
+      message: "status harus salah satu dari: aktif, nonaktif",
+    });
+  }
+
+  try {
+    const investor = await prisma.investor.update({
+      where: { investor_id: investorId },
+      data: { status },
+      select: {
+        investor_id: true,
+        name: true,
+        email: true,
+        status: true,
+        created_at: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Status investor berhasil diperbarui",
+      data: investor,
+    });
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ success: false, message: "Investor tidak ditemukan" });
+    }
+
+    console.error("Gagal mengubah status investor:", error);
+    res.status(500).json({ success: false, message: "Gagal mengubah status investor" });
   }
 });
 
@@ -202,6 +347,43 @@ router.get("/notifications", async (_req, res) => {
   } catch (error) {
     console.error("Gagal mengambil log notifikasi:", error);
     res.status(500).json({ success: false, message: "Gagal mengambil log notifikasi" });
+  }
+});
+
+/**
+ * GET /admin/notifications/export
+ * Mengunduh seluruh log notifikasi dalam bentuk file Excel (.xlsx).
+ */
+router.get("/notifications/export", async (_req, res) => {
+  try {
+    const notifications = await prisma.notification.findMany({
+      orderBy: { sent_at: "desc" },
+      include: {
+        investor: { select: { name: true, email: true } },
+        alert: { include: { provider: true } },
+      },
+    });
+
+    const rows = notifications.map((notification, index) => ({
+      No: index + 1,
+      "Nama Pengguna": notification.investor.name,
+      Email: notification.investor.email,
+      Penyedia: notification.alert.provider.display_name,
+      "Harga Target": Number(notification.alert.target_price),
+      "Jenis Harga": notification.alert.price_type === "beli" ? "Harga Beli" : "Harga Jual",
+      "Waktu Terkirim": formatWaktuWIB(notification.sent_at),
+      Status: notification.status === "sent" ? "Terkirim" : "Gagal",
+    }));
+
+    sendExcelFile(
+      res,
+      `log-notifikasi-${formatTanggalFile(new Date())}.xlsx`,
+      "Notifikasi",
+      rows
+    );
+  } catch (error) {
+    console.error("Gagal mengekspor log notifikasi:", error);
+    res.status(500).json({ success: false, message: "Gagal mengekspor log notifikasi" });
   }
 });
 

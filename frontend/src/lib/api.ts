@@ -199,6 +199,60 @@ export async function register(input: {
 }
 
 /**
+ * Bentuk respons POST /auth/forgot-password dan /auth/reset-password (related backend/src/routes/auth.ts).
+ */
+interface MessageResponse {
+  success: boolean;
+  message: string;
+}
+
+export async function forgotPassword(email: string): Promise<string> {
+  const { data } = await api.post<MessageResponse>("/auth/forgot-password", { email });
+  return data.message;
+}
+
+export async function resetPassword(input: { token: string; password: string }): Promise<string> {
+  const { data } = await api.post<MessageResponse>("/auth/reset-password", input);
+  return data.message;
+}
+
+/**
+ * Endpoint profil investor yang sedang login (related backend/src/routes/profile.ts)
+ */
+export interface ProfileData {
+  investor_id: number;
+  name: string;
+  email: string;
+  created_at: string;
+}
+
+interface ProfileResponse {
+  success: boolean;
+  data: ProfileData;
+}
+
+export async function getProfile(): Promise<ProfileData> {
+  const { data } = await api.get<ProfileResponse>("/profile");
+  return data.data;
+}
+
+export async function updateProfile(input: { name?: string; email?: string }): Promise<ProfileData> {
+  const { data } = await api.patch<ProfileResponse>("/profile", input);
+  return data.data;
+}
+
+export async function updateProfilePassword(input: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<string> {
+  const { data } = await api.patch<MessageResponse>("/profile/password", {
+    current_password: input.currentPassword,
+    new_password: input.newPassword,
+  });
+  return data.message;
+}
+
+/**
  * Endpoint panel admin (related backend/src/routes/admin.ts)
  */
 
@@ -260,6 +314,7 @@ export interface AdminInvestorItem {
   investor_id: number;
   name: string;
   email: string;
+  status: "aktif" | "nonaktif";
   created_at: string;
 }
 
@@ -270,6 +325,23 @@ interface AdminInvestorsResponse {
 
 export async function getAdminInvestors(): Promise<AdminInvestorItem[]> {
   const { data } = await api.get<AdminInvestorsResponse>("/admin/investors");
+  return data.data;
+}
+
+interface UpdateInvestorStatusResponse {
+  success: boolean;
+  message: string;
+  data: AdminInvestorItem;
+}
+
+export async function updateInvestorStatus(
+  investorId: number,
+  status: "aktif" | "nonaktif"
+): Promise<AdminInvestorItem> {
+  const { data } = await api.patch<UpdateInvestorStatusResponse>(
+    `/admin/investors/${investorId}/status`,
+    { status }
+  );
   return data.data;
 }
 
@@ -291,4 +363,36 @@ interface AdminNotificationsResponse {
 export async function getAdminNotifications(): Promise<AdminNotificationItem[]> {
   const { data } = await api.get<AdminNotificationsResponse>("/admin/notifications");
   return data.data;
+}
+
+/**
+ * Nama file diambil dari header yang dikirim backend
+ * (mis. `daftar-investor-2026-08-23.xlsx`), supaya format tanggalnya konsisten
+ * dengan zona waktu server, bukan jam di browser pengguna.
+ */
+function extractFilename(contentDisposition: string | undefined, fallback: string): string {
+  const match = contentDisposition?.match(/filename="?([^"]+)"?/);
+  return match?.[1] ?? fallback;
+}
+
+async function downloadFile(url: string, fallbackFilename: string): Promise<void> {
+  const response = await api.get(url, { responseType: "blob" });
+  const filename = extractFilename(response.headers["content-disposition"], fallbackFilename);
+
+  const blobUrl = URL.createObjectURL(response.data);
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(blobUrl);
+}
+
+export function exportAdminInvestors(): Promise<void> {
+  return downloadFile("/admin/investors/export", "daftar-investor.xlsx");
+}
+
+export function exportAdminNotifications(): Promise<void> {
+  return downloadFile("/admin/notifications/export", "log-notifikasi.xlsx");
 }
