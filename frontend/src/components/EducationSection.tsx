@@ -24,10 +24,10 @@ const TOPICS = [
 export function EducationSection() {
   return (
     <div className="mt-11 border-t border-border pt-7">
-      <h2 className="mb-1 text-[15px] font-bold text-foreground">
+      <h2 className="mb-1 text-[20px] font-bold text-foreground">
         Memahami Investasi Emas
       </h2>
-      <p className="mb-4 text-xs text-muted-foreground">
+      <p className="mb-4 text-[14px] text-muted-foreground">
         Pelajari istilah dan konsep penting seputar emas sebelum memulai investasi.
       </p>
 
@@ -38,10 +38,10 @@ export function EducationSection() {
             className="rounded-xl border border-border bg-card p-4"
           >
             <topic.icon className="mb-2 text-foreground" width={32} height={32} />
-            <h3 className="mb-1 text-xs font-semibold text-foreground">
+            <h3 className="mb-1 text-[14px] font-semibold text-foreground">
               {topic.title}
             </h3>
-            <p className="text-[11px] leading-relaxed text-muted-foreground">
+            <p className="text-[13px] leading-relaxed text-muted-foreground">
               {topic.description}
             </p>
           </div>

@@ -80,7 +80,7 @@ export default async function HomePage() {
 
             <div className="flex items-start gap-2.5 rounded-[10px] border border-amber-200 bg-amber-50 px-4 py-2.5">
               <WarningCircle width={24} height={24} className="mt-px shrink-0 text-amber-800" />
-              <p className="text-[11px] leading-relaxed text-amber-800">
+              <p className="text-[13px] leading-relaxed text-amber-800">
                 <strong>Disclaimer:</strong> Data harga bersumber dari layanan agregasi publik, bukan dari API resmi penyedia. Informasi ini
                 hanya untuk referensi dan bukan merupakan saran investasi. Selalu verifikasi langsung ke platform resmi sebelum bertransaksi.
               </p>

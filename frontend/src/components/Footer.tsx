@@ -11,7 +11,7 @@ export function Footer() {
         {/* <p className="text-center text-[11px] text-muted-foreground">
           Data bersumber dari layanan API publik. Bukan merupakan saran investasi finansial.
         </p> */}
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-[12px] text-muted-foreground">
           © {new Date().getFullYear()} Sistem Agregator Emas
         </p>
       </div>
