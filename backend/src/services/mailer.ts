@@ -1,24 +1,18 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-/* Detail config SMTP dimasukan kedalam file .env */
-const SMTP_HOST = process.env.SMTP_HOST;
-const SMTP_PORT = process.env.SMTP_PORT;
-const SMTP_USER = process.env.SMTP_USER;
-const SMTP_PASS = process.env.SMTP_PASS;
+/**
+ * Railway memblokir koneksi SMTP langsung (port 587 & 465), sehingga
+ * Nodemailer tidak bisa dipakai di production. Resend memakai HTTP API
+ * sehingga tidak terkena blokir tersebut. Detail config diambil dari .env.
+ */
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM = process.env.RESEND_FROM;
 
-if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
-  throw new Error("Konfigurasi SMTP belum lengkap di environment variables (.env)");
+if (!RESEND_API_KEY || !RESEND_FROM) {
+  throw new Error("Konfigurasi Resend belum lengkap di environment variables (.env)");
 }
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: process.env.SMTP_SECURE === 'true', // true untuk port 465
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = new Resend(RESEND_API_KEY);
 
 interface SendMailInput {
   to: string;
@@ -27,10 +21,13 @@ interface SendMailInput {
 }
 
 export async function sendMail({ to, subject, text }: SendMailInput): Promise<void> {
-  await transporter.sendMail({
-    from: `"Agregator Emas" <${SMTP_USER}>`,
+  const { error } = await resend.emails.send({
+    from: `Agregator Emas <${RESEND_FROM}>`,
     to,
     subject,
     text,
   });
+  if (error) {
+    throw new Error(`Gagal mengirim email via Resend: ${error.message}`);
+  }
 }
