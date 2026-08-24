@@ -84,9 +84,24 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
       const data = await getAlerts();
       setAlerts(data);
       setAlertsError(null);
+      return data;
     } catch (error) {
       setAlertsError(extractErrorMessage(error, "Gagal mengambil daftar target notifikasi."));
+      return null;
     }
+  }
+
+  /**
+   * pollAlertUntilResolved hanya dipanggil jika harga yang di input = harga saat ini, agar card notifikasi bisa di cek dan dipindah ke tab selesai begitu email terkirim.
+   */
+  function pollAlertUntilResolved(alertId: number, attemptsLeft: number) {
+    if (attemptsLeft <= 0) return;
+    setTimeout(async () => {
+      const data = await refreshAlerts();
+      const target = data?.find((item) => item.alertId === alertId);
+      if (target && target.status === "selesai") return;
+      pollAlertUntilResolved(alertId, attemptsLeft - 1);
+    }, 4000);
   }
 
   /**
@@ -178,11 +193,19 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
     setIsSubmitting(true);
 
     try {
-      await createAlert({ providerSource: selectedSource, targetPrice: value, priceType: jenis });
+      const created = await createAlert({ providerSource: selectedSource, targetPrice: value, priceType: jenis });
       setSuccessMessage("Target notifikasi berhasil disimpan!");
       setTargetInput("");
       setSelectedSource(null);
       await refreshAlerts();
+
+      /**
+       * Hanya di-poll kalau target di-set sama persis dengan harga saat ini (targetAlreadyMet).
+       */
+      if (targetAlreadyMet) {
+        pollAlertUntilResolved(created.alertId, 5);
+      }
+
       /**
        * Pesan berhasil hanya ditampilkan sebentar agar tidak memenuhi tampilan.
        */

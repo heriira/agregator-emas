@@ -2,6 +2,7 @@ import { Router } from "express";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 import { requireAuth } from "../middleware/auth";
+import { checkPriceAlerts } from "../services/notifier";
 
 const router = Router();
 
@@ -135,6 +136,12 @@ router.post("/", async (req, res) => {
       message: "Target notifikasi berhasil dibuat",
       data: formatAlert(alert),
     });
+    /**
+     * Time out durasi pemanggilan function checkPriceLerts()
+     */
+    setTimeout(() => {
+      checkPriceAlerts().catch(console.error);
+    }, 2000);
   } catch (error) {
     console.error("Gagal membuat target notifikasi:", error);
     res.status(500).json({ success: false, message: "Gagal membuat target notifikasi" });
