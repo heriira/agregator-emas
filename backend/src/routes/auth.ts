@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { prisma } from "../lib/prisma";
-import { sendMail } from "../services/mailer";
+import { sendMail, renderTemplate, SUPPORT_EMAIL } from "../services/mailer";
 
 const router = Router();
 
@@ -222,7 +222,11 @@ router.post("/forgot-password", async (req, res) => {
       await sendMail({
         to: investor.email,
         subject: "Reset Kata Sandi - Agregator Emas",
-        text: `Halo ${investor.name},\n\nKami menerima permintaan untuk mereset kata sandi akun Agregator Emas Anda. Klik link berikut untuk membuat kata sandi baru (berlaku 1 jam):\n\n${resetLink}\n\nJika Anda tidak meminta ini, abaikan saja email ini.`,
+        html: renderTemplate("email_reset_password", {
+          name: investor.name,
+          resetUrl: resetLink,
+          supportEmail: SUPPORT_EMAIL,
+        }),
       });
     } catch (mailError) {
       /**

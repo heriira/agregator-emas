@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
-import { sendMail } from "./mailer";
+import { sendMail, renderTemplate, SUPPORT_EMAIL } from "./mailer";
 
 type AlertWithRelations = Prisma.PriceAlertGetPayload<{
   include: { provider: true; investor: true };
@@ -50,10 +50,19 @@ async function processAlert(alert: AlertWithRelations): Promise<void> {
 
   let notificationStatus: "sent" | "failed" = "sent";
   try {
+    const formatRupiah = (value: number) => `Rp${value.toLocaleString("id-ID")}`;
+
     await sendMail({
       to: alert.investor.email,
       subject: `Target harga ${alert.provider.display_name} tercapai`,
-      text: buildAlertEmailText(alert, targetPrice, currentPrice),
+      html: renderTemplate("email_notifikasi_harga", {
+        name: alert.investor.name,
+        providerName: alert.provider.display_name,
+        targetPrice: formatRupiah(targetPrice),
+        currentPrice: formatRupiah(currentPrice),
+        priceType: alert.price_type === "beli" ? "Harga Beli" : "Harga Jual",
+        supportEmail: SUPPORT_EMAIL,
+      }),
     });
   } catch (error) {
     console.error(`Gagal mengirim email untuk alert #${alert.alert_id}:`, error);
@@ -76,23 +85,24 @@ async function processAlert(alert: AlertWithRelations): Promise<void> {
   ]);
 }
 
-/* Menyusun isi informasi yang ada di email notifikasi */
-function buildAlertEmailText(
-  alert: AlertWithRelations,
-  targetPrice: number,
-  currentPrice: number
-): string {
-  const jenisLabel = alert.price_type === "beli" ? "Harga beli" : "Harga jual";
-  const formatRupiah = (value: number) => `Rp${value.toLocaleString("id-ID")}`;
-
-  return [
-    `Halo ${alert.investor.name},`,
-    "",
-    `${jenisLabel} emas dari ${alert.provider.display_name} sudah mencapai target yang kamu tentukan.`,
-    "",
-    `Target: ${formatRupiah(targetPrice)}/gram`,
-    `Harga saat ini: ${formatRupiah(currentPrice)}/gram`,
-    "",
-    "Buka Agregator Emas untuk melihat detail lebih lanjut.",
-  ].join("\n");
-}
+/**
+ * function buildAlertEmailText(
+ *   alert: AlertWithRelations,
+ *   targetPrice: number,
+ *   currentPrice: number
+ * ): string {
+ *   const jenisLabel = alert.price_type === "beli" ? "Harga beli" : "Harga jual";
+ *   const formatRupiah = (value: number) => `Rp${value.toLocaleString("id-ID")}`;
+ *
+ *   return [
+ *     `Halo ${alert.investor.name},`,
+ *     "",
+ *     `${jenisLabel} emas dari ${alert.provider.display_name} sudah mencapai target yang kamu tentukan.`,
+ *     "",
+ *     `Target: ${formatRupiah(targetPrice)}/gram`,
+ *     `Harga saat ini: ${formatRupiah(currentPrice)}/gram`,
+ *     "",
+ *     "Buka Agregator Emas untuk melihat detail lebih lanjut.",
+ *   ].join("\n");
+ * }
+*/
