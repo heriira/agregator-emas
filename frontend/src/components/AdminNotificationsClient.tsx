@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/Pagination";
 import {
   Table,
   TableBody,
@@ -37,10 +38,13 @@ function formatDateTime(iso: string) {
   );
 }
 
+const PAGE_SIZE = 10;
+
 export function AdminNotificationsClient() {
   const [notifications, setNotifications] = useState<AdminNotificationItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     let ignore = false;
@@ -56,6 +60,11 @@ export function AdminNotificationsClient() {
       ignore = true;
     };
   }, []);
+
+  const paginated = useMemo(
+    () => (notifications ?? []).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [notifications, page]
+  );
 
   async function handleExport() {
     setError(null);
@@ -118,9 +127,11 @@ export function AdminNotificationsClient() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {notifications.map((notification, index) => (
+              {paginated.map((notification, index) => (
                 <TableRow key={notification.notificationId}>
-                  <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {(page - 1) * PAGE_SIZE + index + 1}
+                  </TableCell>
                   <TableCell>
                     <p className="font-medium text-foreground">{notification.investor.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -152,6 +163,12 @@ export function AdminNotificationsClient() {
               ))}
             </TableBody>
           </Table>
+          <Pagination
+            currentPage={page}
+            totalItems={notifications.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/Pagination";
 import {
   Table,
   TableBody,
@@ -42,6 +43,8 @@ function formatDate(iso: string) {
   }).format(new Date(iso));
 }
 
+const PAGE_SIZE = 10;
+
 export function AdminInvestorsClient() {
   const [investors, setInvestors] = useState<AdminInvestorItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +52,7 @@ export function AdminInvestorsClient() {
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<AdminInvestorItem | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     let ignore = false;
@@ -92,6 +96,11 @@ export function AdminInvestorsClient() {
       applyStatusChange(investor, "aktif");
     }
   }
+
+  const paginated = useMemo(
+    () => (investors ?? []).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [investors, page]
+  );
 
   async function handleExport() {
     setActionError(null);
@@ -156,13 +165,15 @@ export function AdminInvestorsClient() {
                 <TableHead>Email</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Tanggal Daftar</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
+                <TableHead className="text-center">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {investors.map((investor, index) => (
+              {paginated.map((investor, index) => (
                 <TableRow key={investor.investor_id}>
-                  <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {(page - 1) * PAGE_SIZE + index + 1}
+                  </TableCell>
                   <TableCell className="font-medium text-foreground">
                     {investor.name}
                   </TableCell>
@@ -181,7 +192,7 @@ export function AdminInvestorsClient() {
                   <TableCell className="text-muted-foreground">
                     {formatDate(investor.created_at)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-center">
                     <Button
                       variant="outline"
                       size="sm"
@@ -199,6 +210,12 @@ export function AdminInvestorsClient() {
               ))}
             </TableBody>
           </Table>
+          <Pagination
+            currentPage={page}
+            totalItems={investors.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setPage}
+          />
         </div>
       )}
 

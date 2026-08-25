@@ -25,11 +25,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ProviderLogo } from "@/components/ProviderLogo";
+import { Pagination } from "@/components/Pagination";
 import { getAdminProviders, updateProviderVisibility } from "@/lib/api";
 import type { AdminProviderItem } from "@/lib/api";
 import { Check, Commodity, EyeClosed, SmartphoneDevice, Xmark } from "iconoir-react";
 
 type Filter = "semua" | "fisik" | "digital" | "hidden";
+
+const PAGE_SIZE = 10;
 
 function extractErrorMessage(error: unknown, fallback: string): string {
   if (axios.isAxiosError(error) && typeof error.response?.data?.message === "string") {
@@ -63,6 +66,7 @@ export function AdminProvidersClient() {
   const [search, setSearch] = useState("");
   const [pending, setPending] = useState<PendingAction | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [page, setPage] = useState(1);
 
   async function refreshProviders() {
     try {
@@ -104,6 +108,11 @@ export function AdminProvidersClient() {
     }
     return result;
   }, [providers, filter, search]);
+
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  );
 
   const stats = useMemo(() => {
     const list = providers ?? [];
@@ -185,7 +194,11 @@ export function AdminProvidersClient() {
               key={f}
               size="sm"
               variant={filter === f ? "default" : "outline"}
-              onClick={() => setFilter(f)}
+              onClick={() => {
+                setFilter(f);
+                /** Kembali ke halaman 1 supaya tidak "nyangkut" di halaman yang jadi kosong setelah filter berubah. */
+                setPage(1);
+              }}
             >
               {f === "semua" && "Semua"}
               {f === "fisik" && (
@@ -209,7 +222,10 @@ export function AdminProvidersClient() {
         <Input
           placeholder="Cari penyedia..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           className="w-[220px]"
         />
       </div>
@@ -247,7 +263,7 @@ export function AdminProvidersClient() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((provider, index) => {
+              {paginated.map((provider, index) => {
                 const isVisible = provider.status === "visible";
 
                 return (
@@ -255,7 +271,9 @@ export function AdminProvidersClient() {
                     key={provider.providerId}
                     className={isVisible ? "" : "opacity-60"}
                   >
-                    <TableCell className="text-muted-foreground">{index + 1}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {(page - 1) * PAGE_SIZE + index + 1}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2.5">
                         <ProviderLogo
@@ -311,11 +329,6 @@ export function AdminProvidersClient() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className={
-                          isVisible
-                            ? "border-red-200 text-red-700 hover:bg-red-50"
-                            : "border-green-200 text-green-700 hover:bg-green-50"
-                        }
                         onClick={() => openConfirm(provider)}
                       >
                         {isVisible ? "Sembunyikan" : "Tampilkan"}
@@ -326,6 +339,12 @@ export function AdminProvidersClient() {
               })}
             </TableBody>
           </Table>
+          <Pagination
+            currentPage={page}
+            totalItems={filtered.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setPage}
+          />
         </div>
       )}
 
