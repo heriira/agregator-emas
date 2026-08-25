@@ -13,6 +13,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Sistem Agregator Emas",
   description: "Bandingkan harga beli dan jual emas fisik & digital dari berbagai penyedia di dalam satu platform",
+  icons:{
+    icon: "/favicon.svg",
+  }
 };
 
 /**

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuthToken, getStoredInvestor, clearAuthSession } from "@/lib/auth";
+import Image from "next/image";
 
 const NAV_LINKS = [
   { href: "/", label: "Harga Emas" },
@@ -27,12 +28,13 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-border bg-card">
       <div className="relative mx-auto flex h-14 max-w-[1100px] items-center gap-8 px-6">
         <Link href="/" className="mr-2 flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-[13px] font-bold text-gold">AE</span>
-          </div>
-          <span className="text-[15px] font-bold tracking-tight text-foreground">
-            Agregator Emas
-          </span>
+          <Image
+            src="/logo-agregator.svg"
+            alt="Agregator Emas"
+            width={160}
+            height={40}
+            className="object-contain"
+          />
         </Link>
         {/* Menu navigasi disembunyikan di mobile (< 768px) dipindah ke BottomNav. */}
         <div className="hidden h-full items-stretch gap-1 md:flex">
@@ -46,7 +48,7 @@ export function Navbar() {
                   "relative flex items-center px-3.5 text-[13px] font-medium transition-colors",
                   isActive
                     ? "font-semibold text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {link.label}
@@ -65,7 +67,10 @@ export function Navbar() {
                 href="/profil"
                 className="hidden text-[13px] text-muted-foreground hover:text-foreground sm:inline"
               >
-                Halo, <strong className="font-semibold text-foreground">{investor.name}</strong>
+                Halo,{" "}
+                <strong className="font-semibold text-foreground">
+                  {investor.name}
+                </strong>
               </Link>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 Keluar
@@ -81,7 +86,11 @@ export function Navbar() {
               >
                 Masuk
               </Button>
-              <Button size="sm" nativeButton={false} render={<Link href="/register" />}>
+              <Button
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/register" />}
+              >
                 Daftar
               </Button>
             </>
