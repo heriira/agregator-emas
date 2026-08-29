@@ -5,6 +5,15 @@ import axios from "axios";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { AlertCard } from "@/components/AlertCard";
 import { ProviderLogo } from "@/components/ProviderLogo";
 import { formatRupiah } from "@/lib/format";
@@ -76,6 +85,7 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
   const [alertsError, setAlertsError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabStatus>("aktif");
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [formOpen, setFormOpen] = useState(true);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -236,6 +246,7 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
       setAlertsError(extractErrorMessage(error, "Gagal menghapus target notifikasi."));
     } finally {
       setDeletingId(null);
+      setDeleteTargetId(null);
     }
   }
 
@@ -497,13 +508,41 @@ function NotifikasiContent({ providers }: NotifikasiClientProps) {
                 key={alert.alertId}
                 alert={alert}
                 currentPrice={currentPrice}
-                onDelete={() => handleDelete(alert.alertId)}
+                onDelete={() => setDeleteTargetId(alert.alertId)}
                 isDeleting={deletingId === alert.alertId}
               />
             );
           })
         )}
       </div>
+
+      <Dialog
+        open={deleteTargetId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTargetId(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hapus Target Notifikasi</DialogTitle>
+            <DialogDescription>
+              Apakah kamu yakin ingin menghapus target notifikasi ini?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline" disabled={deletingId !== null} />}>
+              Batal
+            </DialogClose>
+            <Button
+              variant="destructive"
+              disabled={deletingId !== null}
+              onClick={() => deleteTargetId !== null && handleDelete(deleteTargetId)}
+            >
+              {deletingId !== null ? "Menghapus..." : "Hapus"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
