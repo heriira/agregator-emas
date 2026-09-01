@@ -12,7 +12,10 @@ import { Xmark } from "iconoir-react";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function extractErrorMessage(error: unknown, fallback: string): string {
-  if (axios.isAxiosError(error) && typeof error.response?.data?.message === "string") {
+  if (
+    axios.isAxiosError(error) &&
+    typeof error.response?.data?.message === "string"
+  ) {
     return error.response.data.message;
   }
   return fallback;
@@ -51,23 +54,27 @@ export function AdminLoginForm() {
 
   return (
     <div className="w-full max-w-[380px] rounded-[20px] border border-border bg-card p-8 shadow-sm">
-      <div className="mb-6 flex items-center gap-2">
-        <div className="flex size-9 items-center justify-center rounded-[10px] bg-primary">
-          <span className="text-sm font-bold text-gold">AE</span>
-        </div>
-        <div>
-          <p className="text-base font-bold tracking-tight text-foreground">Agregator Emas</p>
-          <p className="text-[11px] text-muted-foreground">Dashboard Admin</p>
-        </div>
-      </div>
+      {/* <div className="mb-6 flex items-center gap-2">
+        <Image
+          src="/logo-agregator.svg"
+          alt="Agregator Emas"
+          width={200}
+          height={64}
+          className="object-contain"
+        />
+      </div> */}
 
-      <p className="mb-1 text-xl font-bold text-foreground">Masuk sebagai Admin</p>
+      <p className="mb-1 text-xl font-bold text-foreground">
+        Masuk sebagai Admin
+      </p>
       <p className="mb-5 text-[13px] text-muted-foreground">
         Khusus untuk pengelola sistem Agregator Emas.
       </p>
 
       <div className="mb-3.5">
-        <label className="mb-1.5 block text-xs font-medium text-gray-700">Email</label>
+        <label className="mb-1.5 block text-xs font-medium text-gray-700">
+          Email
+        </label>
         <Input
           type="email"
           placeholder="admin@agregatoremas.id"
@@ -80,7 +87,9 @@ export function AdminLoginForm() {
       </div>
 
       <div className="mb-5">
-        <label className="mb-1.5 block text-xs font-medium text-gray-700">Kata Sandi</label>
+        <label className="mb-1.5 block text-xs font-medium text-gray-700">
+          Kata Sandi
+        </label>
         <Input
           type="password"
           placeholder="Masukkan kata sandi"

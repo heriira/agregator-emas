@@ -4,12 +4,22 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getStoredAdmin, clearAdminSession } from "@/lib/auth";
-import { BellNotification, Group, KeyframesCouple, LogOut } from "iconoir-react";
+import {
+  BellNotification,
+  Group,
+  KeyframesCouple,
+  LogOut,
+} from "iconoir-react";
+import Image from "next/image";
 
 const ADMIN_NAV = [
   { href: "/admin", label: "Penyedia Layanan", icon: KeyframesCouple },
   { href: "/admin/investors", label: "Pengguna Terdaftar", icon: Group },
-  { href: "/admin/notifications", label: "Log Notifikasi", icon: BellNotification },
+  {
+    href: "/admin/notifications",
+    label: "Log Notifikasi",
+    icon: BellNotification,
+  },
 ];
 
 export function AdminSidebar() {
@@ -25,13 +35,13 @@ export function AdminSidebar() {
   return (
     <div className="fixed top-0 left-0 flex h-screen w-[220px] flex-col border-r border-border bg-card p-3 py-5">
       <div className="mb-7 flex items-center gap-2 px-2">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
-          <span className="text-[13px] font-bold text-gold">AE</span>
-        </div>
-        <div>
-          <p className="text-[13px] font-bold text-foreground">Agregator Emas</p>
-          <p className="text-[10px] text-muted-foreground">Dashboard Admin</p>
-        </div>
+        <Image
+          src="/logo-agregator.svg"
+          alt="Agregator Emas"
+          width={160}
+          height={40}
+          className="object-contain"
+        />
       </div>
 
       <div className="flex flex-1 flex-col gap-0.5">
@@ -45,7 +55,7 @@ export function AdminSidebar() {
                 "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors",
                 isActive
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <item.icon width={18} height={18} /> {item.label}
@@ -62,10 +72,12 @@ export function AdminSidebar() {
             </span>
           </div>
           <div className="min-w-0">
-            <p className="truncate text-xs font-semibold text-foreground">
+            <p className="truncate text-[13px] font-semibold text-foreground">
               {admin?.name ?? "Admin"}
             </p>
-            <p className="truncate text-[10px] text-muted-foreground">{admin?.email}</p>
+            <p className="truncate text-[12px] text-muted-foreground">
+              {admin?.email}
+            </p>
           </div>
         </div>
         <button
