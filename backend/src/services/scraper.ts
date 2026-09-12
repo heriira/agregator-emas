@@ -25,7 +25,6 @@ interface MaulanarResponse {
 const PROVIDER_SOURCES: Record<string, { brand: string; resource: string }> = {
   antam: { brand: "ANTAM", resource: "antam" },
   galeri24: { brand: "GALERI 24", resource: "galeri24" },
-  "lotus-archi": { brand: "LOTUS ARCHI", resource: "lotusarchi" },
   emasku: { brand: "EMASKU", resource: "hartadinata" },
 };
 
@@ -216,10 +215,10 @@ export async function refreshDigitalGoldPrices(): Promise<void> {
   );
 }
 
-/* 
+/*
 * ============================================================================
-* PROVIDER dari api-emas.up.railway.app (IndoGold, Cermati, UBS)
-* ============================================================================ 
+* PROVIDER dari api-emas.up.railway.app (IndoGold, Cermati, UBS, Lotus Archi)
+* ============================================================================
 */
 
 const HARGA_EMAS_API_URL = process.env.HARGA_EMAS_API_URL;
@@ -238,7 +237,15 @@ interface HargaEmasApiResponse {
   data: HargaEmasApiItem[];
 }
 
-const HARGA_EMAS_API_SOURCES = ["indogold", "cermati", "ubs"] as const;
+/*
+ * Key = source di database (goldProvider.source), value = source di response api-emas.up.railway.app.
+ */
+const HARGA_EMAS_API_SOURCES: Record<string, string> = {
+  indogold: "indogold",
+  cermati: "cermati",
+  ubs: "ubs",
+  "lotus-archi": "lotusarchi",
+};
 
 async function fetchHargaEmasApi(): Promise<HargaEmasApiItem[]> {
   const { data } = await axios.get<HargaEmasApiResponse>(`${HARGA_EMAS_API_URL}/api/harga-emas`);
@@ -247,9 +254,9 @@ async function fetchHargaEmasApi(): Promise<HargaEmasApiItem[]> {
 }
 
 /**
- * Mengambil & menyimpan harga terbaru dari IndoGold, Cermati, dan UBS lewat
- * api-emas.up.railway.app. Dipanggil BERSAMAAN dengan refreshGoldPrices() dan
- * refreshDigitalGoldPrices() di setiap request GET /prices
+ * Mengambil & menyimpan harga terbaru dari IndoGold, Cermati, UBS, dan Lotus
+ * Archi lewat api-emas.up.railway.app. Dipanggil BERSAMAAN dengan
+ * refreshGoldPrices() dan refreshDigitalGoldPrices() di setiap request GET /prices
  */
 export async function refreshHargaEmasApiPrices(): Promise<void> {
   let items: HargaEmasApiItem[];
@@ -261,12 +268,12 @@ export async function refreshHargaEmasApiPrices(): Promise<void> {
   }
 
   await Promise.allSettled(
-    HARGA_EMAS_API_SOURCES.map(async (source) => {
+    Object.entries(HARGA_EMAS_API_SOURCES).map(async ([dbSource, apiSource]) => {
       try {
-        const item = items.find((i) => i.source === source);
+        const item = items.find((i) => i.source === apiSource);
         if (!item) return;
 
-        const provider = await prisma.goldProvider.findUnique({ where: { source } });
+        const provider = await prisma.goldProvider.findUnique({ where: { source: dbSource } });
         if (!provider) return;
 
         await upsertPriceIfChanged(
@@ -276,7 +283,7 @@ export async function refreshHargaEmasApiPrices(): Promise<void> {
           new Date(item.recordedDate)
         );
       } catch (error) {
-        console.error(`Gagal menyimpan harga "${source}" dari api-emas.up.railway.app:`, error);
+        console.error(`Gagal menyimpan harga "${dbSource}" dari api-emas.up.railway.app:`, error);
       }
     })
   );
