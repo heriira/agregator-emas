@@ -117,11 +117,10 @@ export async function refreshGoldPrices(): Promise<void> {
   );
 }
 
-/* 
+/*
 * ============================================================================
-* PROVIDER DIGITAL (Treasury, Pegadaian, Laku Emas)
-* Sumber: logam-mulia-api.iamutaki.workers.dev
-* ============================================================================ 
+* PROVIDER DIGITAL dari logam-mulia-api.iamutaki.workers.dev
+* ============================================================================
 */
 
 interface DigitalPriceItem {
@@ -145,9 +144,11 @@ interface DigitalProviderConfig {
 }
 
 const DIGITAL_PROVIDER_SOURCES: Record<string, DigitalProviderConfig> = {
-  treasury: { endpoint: "treasury", weight: 1 },
-  pegadaian: { endpoint: "pegadaian", weight: 0.01 },
-  lakuemas: { endpoint: "lakuemas", weight: 1 },
+  /**
+   * treasury: { endpoint: "treasury", weight: 1 },
+   * pegadaian: { endpoint: "pegadaian", weight: 0.01 },
+   * lakuemas: { endpoint: "lakuemas", weight: 1 },
+   */ 
 };
 
 async function fetchDigitalPrice(
@@ -172,6 +173,9 @@ async function fetchDigitalPrice(
   return candidates[0] ?? null;
 }
 
+/*
+ * Normalissi untuk perhitungan pegadaian karena satuanya 0,01gr
+ */
 function normalizeDigitalPrice(
   source: string,
   raw: DigitalPriceItem
@@ -200,8 +204,7 @@ async function refreshDigitalProviderPrice(source: string, config: DigitalProvid
 }
 
 /*
- * Ambil & simpan harga terbaru provider DIGITAL yang masih dari logam-mulia-api (Treasury, Pegadaian, Laku Emas). Dipanggil bareng refreshGoldPrices() di
- * setiap request GET /prices (routes/prices.ts) bukan lewat cron, sesuai
+ * Ambil & simpan harga terbaru provider DIGITAL Dipanggil bareng refreshGoldPrices() di setiap request GET /prices (routes/prices.ts) bukan lewat cron.
  */
 export async function refreshDigitalGoldPrices(): Promise<void> {
   await Promise.allSettled(
@@ -217,7 +220,8 @@ export async function refreshDigitalGoldPrices(): Promise<void> {
 
 /*
 * ============================================================================
-* PROVIDER dari api-emas.up.railway.app (IndoGold, Cermati, UBS, Lotus Archi)
+* PROVIDER dari api-emas.up.railway.app
+* (IndoGold, Cermati, UBS, Lotus Archi, Treasury, Laku Emas, Pegadaian)
 * ============================================================================
 */
 
@@ -245,6 +249,9 @@ const HARGA_EMAS_API_SOURCES: Record<string, string> = {
   cermati: "cermati",
   ubs: "ubs",
   "lotus-archi": "lotusarchi",
+  treasury: "treasury",
+  lakuemas: "lakuemas",
+  pegadaian: "pegadaian",
 };
 
 async function fetchHargaEmasApi(): Promise<HargaEmasApiItem[]> {
@@ -254,9 +261,8 @@ async function fetchHargaEmasApi(): Promise<HargaEmasApiItem[]> {
 }
 
 /**
- * Mengambil & menyimpan harga terbaru dari IndoGold, Cermati, UBS, dan Lotus
- * Archi lewat api-emas.up.railway.app. Dipanggil BERSAMAAN dengan
- * refreshGoldPrices() dan refreshDigitalGoldPrices() di setiap request GET /prices
+ * Mengambil & menyimpan harga terbaru dari IndoGold, Cermati, UBS, Lotus Archi,
+ * Treasury, Laku Emas, dan Pegadaian. Dipanggil BERSAMAAN dengan refreshGoldPrices() dan refreshDigitalGoldPrices() di setiap request GET /prices
  */
 export async function refreshHargaEmasApiPrices(): Promise<void> {
   let items: HargaEmasApiItem[];
